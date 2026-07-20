@@ -1,0 +1,2300 @@
+a=game:GetService("Players")
+
+b=game:GetService("RunService")
+
+c=game:GetService"ReplicatedStorage"
+
+d=game:GetService"UserInputService"
+
+e=game:GetService"TweenService"
+
+f=game:GetService"Debris"
+
+g=game:GetService"Workspace"
+
+h=game:GetService"ContextActionService"
+
+i=c:WaitForChild"Remotes"
+
+j=require(c.Modules.Core.Util)
+
+k=require(c.Modules.Game.UI.BuyPromptUI)
+
+l=require(c.Modules.Game.Emotes.EmotesUI)
+
+m=require(c.Modules.Game.Emotes.EmotesList)
+
+n=require(c.Modules.Core.UI)
+
+o=require(c.Modules.Core.Char)
+
+p=c:WaitForChild"Items"
+
+q=p:WaitForChild"melee"
+
+r=a.LocalPlayer
+
+s=r.Character or r.CharacterAdded:Wait()
+
+t=s:WaitForChild"Humanoid"
+
+u=s:WaitForChild"HumanoidRootPart"
+
+v=a.LocalPlayer
+
+local w={}
+
+x=workspace:WaitForChild"DroppedItems"
+
+
+
+y=g.CurrentCamera,
+
+r:GetMouse()
+
+z=d.TouchEnabled and not d.KeyboardEnabled
+
+
+
+local A
+
+pcall(
+
+function()
+
+A=loadstring(game:HttpGet"https://github.com/Footagesus/WindUI/releases/latest/download/main.lua")()
+
+end
+
+)
+
+local B
+
+if A then
+
+B=
+
+A:CreateWindow
+
+{
+
+Title="Dragon X Hub | Block Spin",
+
+Icon="rbxassetid://11424961420",
+
+Author="[😏]-Block Spin | https://discord.gg/kfTyYh5wMQ",
+
+Folder="Boss",
+
+Size=UDim2.fromOffset(650,400),
+
+Theme="Violet",
+
+Transparent=true,
+
+Resizable=true,
+
+KeyCode=Enum.KeyCode.G
+
+}
+
+
+
+Window:EditOpenButton({
+
+    Title = "Dragon X Hub",
+
+    Icon = "rbxassetid://11424961420",
+
+    CornerRadius = UDim.new(0,16),
+
+    StrokeThickness = 2,
+
+    Color = ColorSequence.new( -- gradient
+
+        Color3.fromHex("#6200ff"), 
+
+        Color3.fromHex("#250061")
+
+    ),
+
+    OnlyMobile = false,
+
+    Enabled = true,
+
+    Draggable = true,
+
+})
+
+
+
+Window:Tag({
+
+    Title = "PVP | Paid",
+
+    Icon = "github",
+
+    Color = Color3.fromHex("#ac30ff"),
+
+    Radius = 13,
+
+})
+
+
+
+else
+
+B={
+
+Tab=function(C)
+
+return{
+
+Section=function()
+
+end,
+
+Toggle=function()
+
+end,
+
+Slider=function()
+
+end,
+
+Button=function()
+
+end,
+
+Input=function()
+
+return{}
+
+end,
+
+Divider=function()
+
+end
+
+}
+
+end
+
+}
+
+end
+
+
+
+local C=B.ConfigManager
+
+local D=C:CreateConfig"CathubConfig"
+
+local E
+
+pcall(
+
+function()
+
+E=c:WaitForChild("Remotes",5):WaitForChild("Send",5)
+
+end
+
+)
+
+
+local Radius = 50
+local CheckInterval = 0.0000001
+local ActiveConnections = {}
+
+local PingHistory = {}
+local MaxHistory = 10
+
+local G=false
+
+local H=120
+
+local I
+
+local J
+
+local K=Drawing.new"Line"
+
+K.Thickness=1
+
+K.Color=Color3.fromRGB(255,50,50)
+
+K.Transparency=1
+
+K.Visible=false
+
+
+
+local L={}
+
+local M=false
+
+local N=false
+
+local O=false
+
+local P={}
+
+
+
+local Q=false
+
+local R=0.05
+
+local S=false
+
+local T=false
+
+local U=40
+
+local V=false
+
+local W=false
+
+local X
+
+local Y=10
+
+local Z
+
+local _
+
+local aa
+
+local ab=state
+
+local ac=0
+
+local ad=false
+
+
+
+
+local ae=1
+
+local af=0.4
+
+local ag=false
+
+local ah
+
+local ai=getgenv or function()
+
+return _G
+
+end
+
+ai().Sky=false
+
+ai().SkyAmount=1000
+
+local aj=false
+
+local ak=false
+
+local JumpHeight = 30
+
+local al={}
+
+local am=-100
+
+local an=30
+
+local ao=0.1
+
+
+
+
+
+
+
+
+
+local ap=20
+
+local aq=0
+
+local ar=0
+
+local as=false
+
+
+
+local at={Common=
+
+Color3.fromRGB(255,255,255),Uncommon=
+
+Color3.fromRGB(99,255,52),Rare=
+
+Color3.fromRGB(51,170,255),Epic=
+
+Color3.fromRGB(237,44,255),Legendary=
+
+Color3.fromRGB(255,150,0),Omega=
+
+Color3.fromRGB(255,20,51)
+
+}
+
+local au={}
+
+local av={}
+
+local aw=false
+
+local ax
+
+local ay=false
+
+local az={}
+
+local aA=100
+
+local aB={}
+
+
+
+local aC
+
+pcall(
+
+function()
+
+for aD,aE in ipairs(getgc(true))do
+
+if typeof(aE)=="table"and rawget(aE,"event")and rawget(aE,"func")then
+
+aC=aE
+
+break
+
+end
+
+end
+
+end
+
+)
+
+
+
+local function getPing()
+
+local aD=r:FindFirstChild"PlayerGui"
+
+if not aD then
+
+return 0.2
+
+end
+
+
+
+local aE=aD:FindFirstChild"NetworkStats"
+
+if not aE then
+
+return 0.2
+
+end
+
+
+
+local aF=aE:FindFirstChild"PingLabel"
+
+if not aF then
+
+return 0.2
+
+end
+
+
+
+local aG=aF.Text
+
+if typeof(aG)~="string"then
+
+return 0.2
+
+end
+
+
+
+local aH=tonumber(aG:match"%d+")
+
+if not aH then
+
+return 0.2
+
+end
+
+
+
+local aI=aH/1000
+
+if aI<0 or aI>2 then
+
+aI=0.2
+
+end
+
+
+
+return aI
+
+end
+
+
+
+local function isPlayerExcluded(aD)
+
+for aE,aF in ipairs(P)do
+
+if aF~=""and string.find(string.lower(aD),string.lower(aF))then
+
+return true
+
+end
+
+end
+
+return false
+
+end
+
+local function getClosestTarget()
+
+local aD
+
+local aE=H
+
+local aF=Vector2.new(y.ViewportSize.X/2,y.ViewportSize.Y/2)
+
+for aG,aH in ipairs(a:GetPlayers())do
+
+if aH~=r and aH.Character then
+
+local aI=aH.Character:FindFirstChild"Head"
+
+local aJ=aH.Character:FindFirstChild"Humanoid"
+
+local aK=aH.Character:FindFirstChild"HumanoidRootPart"
+
+if aI and aJ and aJ.Health>0 and aK then
+
+local aL,aM=y:WorldToViewportPoint(aI.Position)
+
+if aM then
+
+local aN=Vector2.new(aL.X,aL.Y)
+
+local aO=(aN-aF).Magnitude
+
+if aO<=H and not isPlayerExcluded(aH.Name)then
+
+if aO<aE then
+
+aE=aO
+
+aD=aH
+
+end
+
+end
+
+end
+
+end
+
+end
+
+end
+
+return aD
+
+end
+
+local function GetSmoothedPing()
+    local Stats = game:GetService("Stats")
+    local PingStats = Stats.Network.ServerStatsItem["Data Ping"]
+    local pingValue = PingStats:GetValue()
+    
+    table.insert(PingHistory, pingValue)
+    if #PingHistory > MaxHistory then
+        table.remove(PingHistory, 1)
+    end
+    
+    local sum = 0
+    for _, val in ipairs(PingHistory) do
+        sum = sum + val
+    end
+    return (sum / #PingHistory) / 1000
+end
+
+-- Position Prediction
+local function predictPosition(aD, aE)
+    if not aD then return Vector3.zero end
+    
+    local aF = GetSmoothedPing()
+    if aF > 1 then aF = aF + 0.15 end
+    
+    local aG = (aE and aE.AssemblyLinearVelocity) or Vector3.zero
+    return aD.Position + (aG * aF * 1)
+end
+
+
+local function isBehindWall(aD,aE)
+
+local aF=aE-aD
+
+if aF.Magnitude<1 then
+
+return false
+
+end
+
+
+
+local aG={}
+
+
+
+local aH=r.Character
+
+if aH then
+
+table.insert(aG,aH)
+
+end
+
+
+
+local aI=I and I.Character
+
+if aI then
+
+table.insert(aG,aI)
+
+end
+
+
+
+local aJ=workspace:Raycast(aD,aF,RaycastParams.new())
+
+if not aJ then
+
+return false
+
+end
+
+
+
+local aK=aJ.Instance
+
+return aK and not table.find(aG,aK.Parent)
+
+end
+
+
+local function setupCharacter(aD)
+
+s=aD
+
+t=aD:WaitForChild"Humanoid"
+
+u=aD:WaitForChild"HumanoidRootPart"
+
+if _ then
+
+pcall(
+
+function()
+
+_:Disconnect()
+
+end
+
+)
+
+end
+
+_=
+
+b.RenderStepped:Connect(
+
+function()
+
+if Q and t and u then
+
+if t.MoveDirection.Magnitude>0 then
+
+u.CFrame=u.CFrame+(t.MoveDirection.Unit*R)
+
+end
+
+end
+
+end
+
+)
+
+end
+
+local function isDowned()
+
+local aD=o.get_hum()
+
+if not aD then
+
+return false
+
+end
+
+
+
+
+
+if aD.Health<=0 then
+
+return false
+
+end
+
+
+
+return aD:GetAttribute"HasBeenDowned"or aD:GetAttribute"IsDead"
+
+end
+
+
+
+local function getHRP()
+
+local aD=o.current_char.get()
+
+if not aD then
+
+return
+
+end
+
+return aD:FindFirstChild"HumanoidRootPart"
+
+end
+
+
+
+local function teleportUnderground()
+
+local aD=getHRP()
+
+if not aD then
+
+return
+
+end
+
+if not ah then
+
+local aE=aD.CFrame
+
+ah=aE+Vector3.new(0,am,0)
+
+end
+
+    aD.CFrame.new(ah.Position)
+end
+
+
+
+local function flickerAndMove()
+
+if ag then
+
+return
+
+end
+
+ag=true
+
+
+
+task.spawn(
+
+function()
+
+while ag and enabled and isDowned()do
+
+local aD=o.get_hum()
+
+if aD and aD.Health<=0 then
+
+break
+
+end
+
+
+
+local aE=getHRP()
+
+if aE and ah then
+
+local aF=math.random()*math.pi*2
+
+local aG=Vector3.new(math.cos(aF),0,math.sin(aF))*an
+
+local aH=ah.Position+aG
+
+
+
+aE.CFrame=CFrame.new(aH)
+
+task.wait(0.05)
+
+aE.CFrame=ah
+
+end
+
+
+
+task.wait(ao)
+
+end
+
+
+
+ag=false
+
+end
+
+)
+
+end
+
+
+
+local function NetGet(...)
+
+if not aC or not aC.func then
+
+return
+
+end
+
+local aD={...}
+
+for aE,aF in ipairs(aD)do
+
+if typeof(aF)=="Instance"then
+
+if aF:IsA"Model"and#aF:GetChildren()==0 then
+
+local aG=g:FindFirstChild"DroppedItems"
+
+if aG then
+
+local aH=aG:FindFirstChildWhichIsA"Model"
+
+if aH then
+
+aD[aE]=aH
+
+else
+
+return
+
+end
+
+else
+
+return
+
+end
+
+end
+
+end
+
+end
+
+aC.func=(aC.func or 0)+1
+
+local aE,aF=
+
+pcall(
+
+function()
+
+local aE=c:WaitForChild"Remotes":WaitForChild"Get"
+
+return aE:InvokeServer(aC.func,unpack(aD))
+
+end
+
+)
+
+if not aE then
+
+warn("[NetGet Error]",aF)
+
+end
+
+return aF
+
+end
+
+
+
+
+local function GetDroppedItemsContainer()
+    return workspace:FindFirstChild("DroppedItems")
+end
+
+local function PickupItem(Item, Character)
+    local PickupZone = Item:FindFirstChild("PickUpZone")
+    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+    
+    if PickupZone and HumanoidRootPart then
+        
+        pcall(function()
+            firetouchinterest(PickupZone, HumanoidRootPart, 0)
+            firetouchinterest(PickupZone, HumanoidRootPart, 1)
+        end)
+    end
+end
+
+
+local function CheckAndPickup()
+    local Character = r.Character 
+    if not Character or not Character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local CharacterPosition = Character:GetPivot().Position
+    local DroppedItemsContainer = GetDroppedItemsContainer()
+    
+    if DroppedItemsContainer then
+        for _, Item in ipairs(DroppedItemsContainer:GetChildren()) do
+            if Item:IsA("Model") then
+                local ItemPosition = Item:GetPivot().Position
+                local Distance = (ItemPosition - CharacterPosition).Magnitude
+                
+                if Distance <= Radius then
+                    PickupItem(Item, Character)
+                end
+            end
+        end
+    end
+end
+
+
+
+
+local function SafeCall(aD,...)
+
+local aE,aF=pcall(aD,...)
+
+return aE,aF
+
+end
+
+
+
+local aD=table.unpack or unpack
+
+
+
+local function CallRemote(aE,...)
+
+if not aE then
+
+return
+
+end
+
+
+
+local aF={...}
+
+
+
+if aE.ClassName=="RemoteEvent"then
+
+if aC and type(aC.event)=="number"then
+
+aC.event=aC.event+1
+
+SafeCall(
+
+function(...)
+
+aE:FireServer(aC.event,...)
+
+end,
+
+aD(aF)
+
+)
+
+else
+
+aq=(aq or 0)+1
+
+SafeCall(
+
+function(...)
+
+aE:FireServer(aq,...)
+
+end,
+
+aD(aF)
+
+)
+
+end
+
+elseif aE.ClassName=="RemoteFunction"then
+
+if aC and type(aC.func)=="number"then
+
+aC.func=aC.func+1
+
+SafeCall(
+
+function(...)
+
+aE:InvokeServer(aC.func,...)
+
+end,
+
+aD(aF)
+
+)
+
+else
+
+ar=(ar or 0)+1
+
+SafeCall(
+
+function(...)
+
+aE:InvokeServer(ar,...)
+
+end,
+
+aD(aF)
+
+)
+
+end
+
+else
+
+SafeCall(
+
+function(...)
+
+if aE.FireServer then
+
+aE:FireServer(...)
+
+elseif aE.InvokeServer then
+
+aE:InvokeServer(...)
+
+end
+
+end,
+
+aD(aF)
+
+)
+
+end
+
+end
+
+
+
+local function getPlayersInRange(aE)
+
+local aF={}
+
+local aG=r.Character
+
+if not aG or not aG.PrimaryPart then
+
+return aF
+
+end
+
+local aH=aG.PrimaryPart.Position
+
+for aI,aJ in pairs(a:GetPlayers())do
+
+if aJ~=r and aJ.Character and aJ.Character.PrimaryPart then
+
+local aK,aL=
+
+pcall(
+
+function()
+
+return(aJ.Character.PrimaryPart.Position-aH).Magnitude
+
+end
+
+)
+
+if aK and aL and aL<=aE then
+
+table.insert(aF,aJ)
+
+end
+
+end
+
+end
+
+return aF
+
+end
+
+
+
+local function getActiveTool()
+
+local aE=r and r.Character
+
+if aE then
+
+for aF,aG in ipairs(aE:GetChildren())do
+
+if
+
+pcall(
+
+function()
+
+return aG:IsA"Tool"
+
+end
+
+)and aG:IsA"Tool"
+
+then
+
+return aG
+
+end
+
+end
+
+end
+
+local aF=r and r:FindFirstChild"Backpack"
+
+if aF then
+
+for aG,aH in ipairs(aF:GetChildren())do
+
+if
+
+pcall(
+
+function()
+
+return aH:IsA"Tool"
+
+end
+
+)and aH:IsA"Tool"
+
+then
+
+return aH
+
+end
+
+end
+
+end
+
+return nil
+
+end
+
+
+
+local function isMeleeTool(aE)
+
+if not aE then
+
+return false
+
+end
+
+if aE.Name=="Fists"then
+
+return true
+
+end
+
+
+
+local aF=game:GetService"ReplicatedStorage"
+
+local aG=aF:WaitForChild"Items":WaitForChild"melee"
+
+local aH=aF:WaitForChild"Items":WaitForChild"throwable"
+
+if aG:FindFirstChild(aE.Name)and not aH:FindFirstChild(aE.Name)then
+
+return true
+
+end
+
+
+
+return false
+
+end
+
+
+
+local function AttackNearby()
+
+if not E then
+
+return
+
+end
+
+local aE=r.Character
+
+if not aE or not aE.PrimaryPart then
+
+return
+
+end
+
+
+
+local aF=getActiveTool()
+
+if not aF or not isMeleeTool(aF)then
+
+return
+
+end
+
+local aG,aH=
+
+pcall(
+
+function()
+
+return aF.Parent
+
+end
+
+)
+
+if not aG or aH~=r.Character then
+
+return
+
+end
+
+
+
+local aI=getPlayersInRange(ap)
+
+if#aI==0 then
+
+return
+
+end
+
+
+
+local aJ,aK=
+
+pcall(
+
+function()
+
+return aE.PrimaryPart.Position
+
+end
+
+)
+
+if not aJ or not aK then
+
+return
+
+end
+
+
+
+local aL={}
+
+local aM={}
+
+
+
+for aN,aO in pairs(aI)do
+
+if aO and aO.Character and aO.Character.PrimaryPart then
+
+local aP=aO.Character:FindFirstChild"Head"
+
+local aQ=aO.Character.PrimaryPart
+
+if aP and aQ then
+
+local aR=predictPosition(aP,aQ)
+
+table.insert(aL,aO)
+
+table.insert(aM,aR)
+
+end
+
+end
+
+end
+
+
+
+if#aL==0 then
+
+return
+
+end
+
+
+
+local aN=aM[1]
+
+local aO=CFrame.lookAt(aK,aN)
+
+
+
+local aP={
+
+"melee_attack",
+
+aF,
+
+aL,
+
+aO,
+
+0.75
+
+}
+
+
+
+pcall(
+
+function()
+
+CallRemote(E,aD(aP))
+
+end
+
+)
+
+end
+
+
+
+local aE=false
+
+local function StartAutoAttack()
+
+if aE then
+
+return
+
+end
+
+aE=true
+
+task.spawn(
+
+function()
+
+while aE do
+
+task.wait(af)
+
+if ab and r and r.Character and r.Character.PrimaryPart then
+
+pcall(AttackNearby)
+
+end
+
+end
+
+end
+
+)
+
+end
+
+
+
+local function createNeonEffectAtPosition(aF,aG)
+
+if not s then
+
+return
+
+end
+
+end
+
+local function performTeleport()
+
+if not u then
+
+return
+
+end
+
+local aF=u.Position
+
+local aG=Vector3.new(aF.X,aF.Y-Y,aF.Z)
+
+u.CFrame=CFrame.new(aG)
+
+X=aG.Y
+
+local aH=Instance.new"Sound"
+
+aH.SoundId="rbxassetid://108156925383225"
+
+aH.Volume=1
+
+aH.PlayOnRemove=true
+
+aH.Parent=u
+
+aH:Destroy()
+
+createNeonEffectAtPosition(aF,1.5)
+
+createNeonEffectAtPosition(aG,2)
+
+end
+
+local function toggleTeleport()
+
+if not W then
+
+return
+
+end
+
+V=not V
+
+if V then
+
+performTeleport()
+
+else
+
+X=nil
+
+end
+
+end
+
+local aF
+
+local function lockYPosition()
+
+if aF then
+
+pcall(
+
+function()
+
+aF:Disconnect()
+
+end
+
+)
+
+end
+
+aF=
+
+b.Heartbeat:Connect(
+
+function()
+
+if V and X and u then
+
+local aG=u.Position
+
+if math.abs(aG.Y-X)>0.1 then
+
+u.CFrame=CFrame.new(aG.X,X,aG.Z)
+
+end
+
+end
+
+end
+
+)
+
+end
+
+
+
+local function registerItems(aG)
+
+for aH,aI in ipairs(aG:GetChildren())do
+
+if aI:IsA"Tool"then
+
+local aJ=aI:FindFirstChild"Handle"
+
+local aK
+
+local aL=aI:GetAttribute"DisplayName"or aI.Name
+
+local aM=aI:GetAttribute"ItemId"or aI:GetAttribute"Id"or aI.Name
+
+local aN=aI:GetAttribute"RarityName"or"Common"
+
+local aO=aI:GetAttribute"ImageId"or"rbxassetid://7072725737"
+
+
+
+
+
+if aJ then
+
+local aP=aJ:FindFirstChildOfClass"SpecialMesh"
+
+if aP and aP.MeshId~=""then
+
+aK=aP.MeshId..(aP.TextureId or"").."_RARITY_"..aN
+
+elseif aJ:IsA"MeshPart"and aJ.MeshId~=""then
+
+aK=aJ.MeshId..(aJ.TextureID or"").."_RARITY_"..aN
+
+end
+
+end
+
+
+
+
+
+if not aK and aM and aM~=""and aM~=aI.Name then
+
+aK="ITEMID_"..aM.."_RARITY_"..aN
+
+end
+
+
+
+
+
+if not aK then
+
+aK="NAME_"..aL.."_"..aI.Name.."_RARITY_"..aN
+
+end
+
+
+
+
+
+if au[aK]then
+
+warn(
+
+"Duplicate weapon key detected: "..aK.." (Tool: "..aI.Name..", Rarity: "..aN..")"
+
+)
+
+end
+
+
+
+au[aK]={
+
+Name=aL,
+
+Rarity=aN,
+
+ImageId=aO,
+
+ToolName=aI.Name
+
+}
+
+end
+
+end
+
+end
+
+
+
+local function getItemKey(aG)
+
+local aH=aG:FindFirstChild"Handle"
+
+local aI=aG:GetAttribute"DisplayName"or aG.Name
+
+local aJ=aG:GetAttribute"ItemId"or aG:GetAttribute"Id"or aG.Name
+
+local aK=aG:GetAttribute"RarityName"or"Common"
+
+
+
+if aH then
+
+local aL=aH:FindFirstChildOfClass"SpecialMesh"
+
+if aL and aL.MeshId~=""then
+
+return aL.MeshId..(aL.TextureId or"").."_RARITY_"..aK
+
+elseif aH:IsA"MeshPart"and aH.MeshId~=""then
+
+return aH.MeshId..(aH.TextureID or"").."_RARITY_"..aK
+
+end
+
+end
+
+
+
+if aJ and aJ~=""and aJ~=aG.Name then
+
+return"ITEMID_"..aJ.."_RARITY_"..aK
+
+end
+
+
+
+return"NAME_"..aI.."_"..aG.Name.."_RARITY_"..aK
+
+end
+
+
+
+local function getWeaponInfo(aG)
+
+if not aG or not aG:IsA"Tool"then
+
+return nil
+
+end
+
+local aH=getItemKey(aG)
+
+return au[aH]
+
+end
+
+
+
+local function createBillboardForPlayer(aG)
+
+if not aw or aG==r then
+
+return
+
+end
+
+local aH=aG.Character
+
+if not aH then
+
+return
+
+end
+
+local aI=aH:FindFirstChild"HumanoidRootPart"
+
+if not aI then
+
+return
+
+end
+
+if av[aG]then
+
+av[aG]:Destroy()
+
+av[aG]=nil
+
+end
+
+local aJ=Instance.new"BillboardGui"
+
+aJ.Adornee=aI
+
+aJ.Size=UDim2.new(0,90,0,20)
+
+aJ.StudsOffset=Vector3.new(0,-5,0)
+
+aJ.AlwaysOnTop=true
+
+aJ.Parent=aH
+
+aJ:ClearAllChildren()
+
+local aK=Instance.new("UIListLayout",aJ)
+
+aK.FillDirection=Enum.FillDirection.Horizontal
+
+aK.SortOrder=Enum.SortOrder.LayoutOrder
+
+aK.Padding=UDim.new(0,5)
+
+aK.HorizontalAlignment=Enum.HorizontalAlignment.Center
+
+local aL={}
+
+for aM,aN in ipairs{"Backpack","StarterGear","StarterPack"}do
+
+local aO=aG:FindFirstChild(aN)
+
+if aO then
+
+for aP,aQ in ipairs(aO:GetChildren())do
+
+if aQ:IsA"Tool"and aQ.Name~="Fists"then
+
+table.insert(aL,aQ)
+
+end
+
+end
+
+end
+
+end
+
+if aH then
+
+for aM,aN in ipairs(aH:GetChildren())do
+
+if aN:IsA"Tool"and aN.Name~="Fists"then
+
+table.insert(aL,aN)
+
+end
+
+end
+
+end
+
+for aM,aN in ipairs(aL)do
+
+local aO=getWeaponInfo(aN)
+
+if aO then
+
+local aP=Instance.new("ImageLabel",aJ)
+
+aP.Size=UDim2.new(0,20,0,20)
+
+aP.BackgroundTransparency=0.1
+
+aP.Image=aO.ImageId
+
+aP.BackgroundColor3=Color3.fromRGB(255, 255, 255)
+
+Instance.new("UICorner",aP).CornerRadius=UDim.new(0,5)
+
+local aQ=Instance.new("UIStroke",aP)
+
+aQ.Color=at[aO.Rarity]or Color3.new(1,1,1)
+
+aQ.Thickness=2
+
+end
+
+end
+
+av[aG]=aJ
+
+end
+
+
+
+local function setFinishPrompt(aG)
+
+if aG and aG:IsA"ProximityPrompt"then
+
+aG.HoldDuration=ae
+
+aG.MaxActivationDistance=20
+
+end
+
+end
+
+local function tryHoldPrompt(aG,aH)
+
+if not aG or aG:GetAttribute"__AutoFinishBusy"then
+
+return
+
+end
+
+aG:SetAttribute("__AutoFinishBusy",true)
+
+pcall(
+
+function()
+
+if aG.InputHoldBegin then
+
+aG:InputHoldBegin()
+
+end
+
+end
+
+)
+
+pcall(
+
+function()
+
+if aG.HoldBegin then
+
+aG:HoldBegin()
+
+end
+
+end
+
+)
+
+pcall(
+
+function()
+
+if aG.Trigger then
+
+aG:Trigger()
+
+end
+
+end
+
+)
+
+task.wait(aH)
+
+pcall(
+
+function()
+
+if aG.InputHoldEnd then
+
+aG:InputHoldEnd()
+
+end
+
+end
+
+)
+
+pcall(
+
+function()
+
+if aG.HoldEnd then
+
+aG:HoldEnd()
+
+end
+
+end
+
+)
+
+aG:SetAttribute("__AutoFinishBusy",nil)
+
+end
+
+local function findFinishPrompts()
+
+local aG={}
+
+for aH,aI in pairs(workspace:GetChildren())do
+
+local aJ=a:GetPlayerFromCharacter(aI)
+
+if aJ and not isPlayerExcluded(aJ.Name)then
+
+local aK=aI:FindFirstChild"HumanoidRootPart"
+
+if aK then
+
+local aL=aK:FindFirstChild"FinishPrompt"
+
+if aL then
+
+setFinishPrompt(aL)
+
+table.insert(aG,aL)
+
+end
+
+end
+
+end
+
+end
+
+return aG
+
+end
+
+local function applyToAll()
+
+for aG,aH in ipairs(a:GetPlayers())do
+
+if aH~=r and aH.Character then
+
+local aI=aH.Character:FindFirstChild"HumanoidRootPart"
+
+if aI then
+
+local aJ=aI:FindFirstChild"FinishPrompt"
+
+if aJ then
+
+setFinishPrompt(aJ)
+
+end
+
+end
+
+end
+
+end
+
+end
+
+local function setupFastFinishForPlayer(aG)
+
+if aG~=r then
+
+aG.CharacterAdded:Connect(
+
+function(aH)
+
+aH.DescendantAdded:Connect(
+
+function(aI)
+
+if
+
+ad and aI.Name=="FinishPrompt"and aI:IsA"ProximityPrompt"and
+
+aI.Parent and
+
+aI.Parent.Name=="HumanoidRootPart"
+
+then
+
+setFinishPrompt(aI)
+
+end
+
+end
+
+)
+
+local aI=aH:WaitForChild("HumanoidRootPart",5)
+
+if aI and ad then
+
+local aJ=aI:FindFirstChild"FinishPrompt"
+
+if aJ then
+
+setFinishPrompt(aJ)
+
+end
+
+end
+
+end
+
+)
+
+if aG.Character then
+
+local aH=aG.Character
+
+aH.DescendantAdded:Connect(
+
+function(aI)
+
+if
+
+ad and aI.Name=="FinishPrompt"and aI:IsA"ProximityPrompt"and
+
+aI.Parent and
+
+aI.Parent.Name=="HumanoidRootPart"
+
+then
+
+setFinishPrompt(aI)
+
+end
+
+end
+
+)
+
+local aI=aH:FindFirstChild"HumanoidRootPart"
+
+if aI and ad then
+
+local aJ=aI:FindFirstChild"FinishPrompt"
+
+if aJ then
+
+setFinishPrompt(aJ)
+
+end
+
+end
+
+end
+
+end
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local function TrySkipCrate()
+
+local aG,aH=
+
+pcall(
+
+function()
+
+return require(c.Modules.Game.CrateSystem.Crate)
+
+end
+
+)
+
+
+
+if not(aG and aH)then
+
+return
+
+end
+
+
+
+task.spawn(
+
+function()
+
+local aI=aH.spinning
+
+if not aI then
+
+return
+
+end
+
+
+
+
+
+local aJ=0
+
+while not aI.get()do
+
+if aJ>3 then
+
+break
+
+end
+
+task.wait(0.05)
+
+aJ=aJ+0.05
+
+end
+
+
+
+if aI.get()then
+
+pcall(
+
+function()
+
+aH.skip_spin()
+
+end
+
+)
+
+end
+
+end
+
+)
+
+end
+
+
+
+local function SetupAutoSkip()
+
+local aG=c:WaitForChild("Remotes",5)
+
+if not aG then
+
+return
+
+end
+
+
+
+local aH=aG:WaitForChild("Send",5)
+
+if not(aH and aH:IsA"RemoteEvent")then
+
+return
+
+end
+
+
+
+aH.OnClientEvent:Connect(
+
+function(...)
+
+if aj then
+
+TrySkipCrate()
+
+end
+
+end
+
+)
+
+end
+
+
+
+local function createESP(aG)
+
+if L[aG]then
+
+return
+
+end
+
+
+
+
+
+local aH=Drawing.new"Text"
+
+aH.Size=16
+
+aH.Center=true
+
+aH.Outline=true
+
+aH.Color=isPlayerExcluded(aG.Name)and Color3.fromRGB(0,255,0)or Color3.fromRGB(255,255,255)
+
+aH.Font=4
+
+
+
+
+
+local aI=Drawing.new"Text"
+
+aI.Size=14
+
+aI.Center=true
+
+aI.Outline=true
+
+aI.Color=Color3.fromRGB(255,255,255)
+
+aI.Font=4
+
+
+
+
+
+local aJ=Drawing.new"Square"
+
+aJ.Filled=false
+
+aJ.Thickness=1
+
+aJ.Color=Color3.fro
