@@ -1,0 +1,37 @@
+--[[
+                            SHADOW X HUB PROJECT
+            This was made by Shadow X Team ( discord.gg/quantumonyx )
+            Service by Luarmor.net
+            Compiled by: Flazhy
+            Copyright © 2022-2026 Shadow X Team - All Rights Reserved.
+]]--
+local Directory = "https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/Games"
+local Api = "https://api.luarmor.net/files/v4/loaders"
+local Scripts = {
+    Free = {
+        [994732206] = Directory .. "/BloxFruits.lua",
+        [9186719164] = Directory .. "/SailorPiece.lua",
+        [8191429227] = Directory .. "/CutTrees.lua",
+    },
+    Premium = {
+        [994732206] = Api .. "/0ae9fe4cf963e3a13d25eed0e2ce5940.lua",
+        [10004244222] = Api .. "/63980a492928552d074ceee243a918d6.lua",
+        [9792947201] = Api .. "/50e8e00251d97215e14313c0bb012058.lua",
+        [10200395747] = Api .. "/65265b2869c03f57430ee45357d8c3f9.lua"
+    }
+}
+
+local gameId = game.GameId
+
+local function LoadScript(tier)
+    local tbl = Scripts[tier]
+    if not tbl then return end
+    local url = tbl[gameId]
+    if not url then
+        warn("[Shadow X Hub] No " .. tier .. " script for GameId: " .. tostring(gameId))
+        return
+    end
+    
+    local ok, err = pcall(function() loadstring(game:HttpGet(url))() end)
+    if not ok then warn("[Shadow X Hub] Error: " .. tostring(err)) end
+end
