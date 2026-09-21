@@ -1,0 +1,506 @@
+-- MS Hub - ESP, Item Icons, Aim Line, Head Lock, Speed & Stamina (Light Purple Edition)
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local ContentProvider = game:GetService("ContentProvider")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- ป้องกันรันซ้ำ
+if CoreGui:FindFirstChild("MSHubUI") then
+    CoreGui.MSHubUI:Destroy()
+end
+
+-- สร้าง ScreenGui หลัก
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MSHubUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- สร้างวงกลม FOV Aimbot บนจอ (สีม่วงอ่อน)
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Visible = false
+FOVCircle.Radius = 150
+FOVCircle.Color = Color3.fromRGB(180, 130, 255)
+FOVCircle.Thickness = 1.5
+FOVCircle.Filled = false
+FOVCircle.Transparency = 0.8
+FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+-- เส้นลากไปหาเป้าหมาย (Aim Line - ไม่ล็อคกล้อง อิงตามวง FOV)
+local AimLine = Drawing.new("Line")
+AimLine.Visible = false
+AimLine.Color = Color3.fromRGB(180, 130, 255)
+AimLine.Thickness = 1.5
+AimLine.Transparency = 0.8
+
+-- 1. ปุ่มเปิด-ปิด เมนูลอย (Floating Toggle Button)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 15, 30)
+ToggleBtn.Position = UDim2.new(0.05, 0, 0.1, 0)
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "MS"
+ToggleBtn.TextColor3 = Color3.fromRGB(180, 130, 255)
+ToggleBtn.TextSize = 18
+ToggleBtn.Draggable = true
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleBtn
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(180, 130, 255)
+ToggleStroke.Thickness = 2
+ToggleStroke.Parent = ToggleBtn
+
+-- 2. หน้าต่างหลัก (Main Frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 12, 25)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -180)
+MainFrame.Size = UDim2.new(0, 400, 0, 440)
+MainFrame.Visible = true
+MainFrame.Draggable = true
+MainFrame.Active = true
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(180, 130, 255)
+MainStroke.Thickness = 1.5
+MainStroke.Parent = MainFrame
+
+-- Top Bar Header
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 12)
+TopCorner.Parent = TopBar
+
+local FixFrame = Instance.new("Frame")
+FixFrame.Parent = TopBar
+FixFrame.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+FixFrame.BorderSizePixel = 0
+FixFrame.Position = UDim2.new(0, 0, 0.5, 0)
+FixFrame.Size = UDim2.new(1, 0, 0.5, 0)
+
+local Title = Instance.new("TextLabel")
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0.03, 0, 0, 0)
+Title.Size = UDim2.new(0.7, 0, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "MS Hub - Main Menu"
+Title.TextColor3 = Color3.fromRGB(180, 130, 255)
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close Button (X)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = TopBar
+CloseBtn.BackgroundColor3 = Color3.fromRGB(230, 50, 50)
+CloseBtn.Position = UDim2.new(1, -32, 0.5, -12)
+CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 12
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    FOVCircle:Remove()
+    AimLine:Remove()
+    ScreenGui:Destroy()
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Container สำหรับจัดเรียงเมนู
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundTransparency = 1
+Container.Position = UDim2.new(0, 10, 0, 50)
+Container.Size = UDim2.new(1, -20, 1, -60)
+Container.CanvasSize = UDim2.new(0, 0, 0, 720)
+Container.ScrollBarThickness = 4
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+-- ฟังก์ชันสร้างปุ่ม Toggle
+local function createToggle(name, callback)
+    local Btn = Instance.new("TextButton")
+    Btn.Parent = Container
+    Btn.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+    Btn.Size = UDim2.new(1, 0, 0, 40)
+    Btn.Font = Enum.Font.GothamMedium
+    Btn.Text = "   " .. name .. " : [ OFF ]"
+    Btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Btn.TextSize = 13
+    Btn.TextXAlignment = Enum.TextXAlignment.Left
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Btn
+
+    local state = false
+    Btn.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            Btn.Text = "   " .. name .. " : [ ON ]"
+            Btn.TextColor3 = Color3.fromRGB(180, 130, 255)
+            Btn.BackgroundColor3 = Color3.fromRGB(35, 25, 55)
+        else
+            Btn.Text = "   " .. name .. " : [ OFF ]"
+            Btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Btn.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+        end
+        pcall(function()
+            callback(state)
+        end)
+    end)
+end
+
+-- ฟังก์ชันสร้าง Slider
+local function createSlider(name, min, max, default, callback)
+    local Frame = Instance.new("Frame")
+    Frame.Parent = Container
+    Frame.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+    Frame.Size = UDim2.new(1, 0, 0, 55)
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Frame
+
+    local Label = Instance.new("TextLabel")
+    Label.Parent = Frame
+    Label.BackgroundTransparency = 1
+    Label.Position = UDim2.new(0, 10, 0, 5)
+    Label.Size = UDim2.new(1, -20, 0, 20)
+    Label.Font = Enum.Font.GothamMedium
+    Label.Text = name .. ": " .. default
+    Label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Label.TextSize = 13
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local SliderBar = Instance.new("TextButton")
+    SliderBar.Parent = Frame
+    SliderBar.BackgroundColor3 = Color3.fromRGB(45, 35, 70)
+    SliderBar.Position = UDim2.new(0, 10, 0, 32)
+    SliderBar.Size = UDim2.new(1, -20, 0, 10)
+    SliderBar.Text = ""
+
+    local SliderCorner = Instance.new("UICorner")
+    SliderCorner.CornerRadius = UDim.new(1, 0)
+    SliderCorner.Parent = SliderBar
+
+    local Fill = Instance.new("Frame")
+    Fill.Parent = SliderBar
+    Fill.BackgroundColor3 = Color3.fromRGB(180, 130, 255)
+    Fill.Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
+    Fill.BorderSizePixel = 0
+
+    local FillCorner = Instance.new("UICorner")
+    FillCorner.CornerRadius = UDim.new(1, 0)
+    FillCorner.Parent = Fill
+
+    local dragging = false
+
+    local function updateInput(input)
+        local pos = UDim2.new(math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1), 0, 1, 0)
+        Fill.Size = pos
+        local val = math.floor(min + ((max - min) * pos.X.Scale))
+        Label.Text = name .. ": " .. val
+        pcall(function() callback(val) end)
+    end
+
+    SliderBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            updateInput(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateInput(input)
+        end
+    end)
+end
+
+-- --- ระบบฟังก์ชันการทำงาน ---
+
+-- 1. มองชื่อตัวละครจริงบนหัว (Player Names ESP)
+local nameEspEnabled = false
+RunService.RenderStepped:Connect(function()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local head = plr.Character.Head
+            local billboard = head:FindFirstChild("MS_NameESP")
+            if nameEspEnabled then
+                if not billboard then
+                    billboard = Instance.new("BillboardGui")
+                    billboard.Name = "MS_NameESP"
+                    billboard.Size = UDim2.new(0, 200, 0, 50)
+                    billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+                    billboard.AlwaysOnTop = true
+                    billboard.Parent = head
+
+                    local textLabel = Instance.new("TextLabel")
+                    textLabel.Name = "NameText"
+                    textLabel.Parent = billboard
+                    textLabel.BackgroundTransparency = 1
+                    textLabel.Size = UDim2.new(1, 0, 1, 0)
+                    textLabel.Font = Enum.Font.GothamBold
+                    textLabel.TextSize = 14
+                    textLabel.TextColor3 = Color3.fromRGB(180, 130, 255)
+                    textLabel.TextStrokeTransparency = 0.5
+                end
+                billboard.NameText.Text = plr.Name .. " (" .. plr.DisplayName .. ")"
+                billboard.Enabled = true
+            else
+                if billboard then billboard.Enabled = false end
+            end
+        end
+    end
+end)
+
+createToggle("มองชื่อตัวละคร (Player Names)", function(enabled)
+    nameEspEnabled = enabled
+end)
+
+-- 2. มองสิ่งของ/อุปกรณ์ที่สวมใส่อยู่เป็นรูปภาพ (Equipped Items Icon ESP)
+local itemEspEnabled = false
+RunService.RenderStepped:Connect(function()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local head = plr.Character.Head
+            local itemBillboard = head:FindFirstChild("MS_ItemESP")
+            
+            if itemEspEnabled then
+                if not itemBillboard then
+                    itemBillboard = Instance.new("BillboardGui")
+                    itemBillboard.Name = "MS_ItemESP"
+                    itemBillboard.Size = UDim2.new(0, 120, 0, 40)
+                    itemBillboard.StudsOffset = Vector3.new(0, 3.8, 0)
+                    itemBillboard.AlwaysOnTop = true
+                    itemBillboard.Parent = head
+
+                    local iconHolder = Instance.new("UIListLayout")
+                    iconHolder.Parent = itemBillboard
+                    iconHolder.FillDirection = Enum.FillDirection.Horizontal
+                    iconHolder.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                    iconHolder.SortOrder = Enum.SortOrder.LayoutOrder
+                    iconHolder.Padding = UDim.new(0, 4)
+                end
+
+                -- เคลียร์ไอคอนเก่าเพื่ออัปเดตใหม่แบบเรียลไทม์
+                for _, child in pairs(itemBillboard:GetChildren()) do
+                    if child:IsA("ImageLabel") then
+                        child:Destroy()
+                    end
+                end
+
+                -- ตรวจสอบหา Tool ที่ถืออยู่ หรือ Accessory ที่สวมใส่
+                local itemsFound = {}
+                
+                -- ตรวจหา Tool ใน Character
+                for _, obj in pairs(plr.Character:GetChildren()) do
+                    if obj:IsA("Tool") then
+                        table.insert(itemsFound, obj)
+                    end
+                end
+
+                -- ตรวจหา BackPack (อาวุธ/ไอเทมหลักที่ถือพก)
+                if plr:FindFirstChild("Backpack") then
+                    for _, obj in pairs(plr.Backpack:GetChildren()) do
+                        if obj:IsA("Tool") then
+                            table.insert(itemsFound, obj)
+                        end
+                    end
+                end
+
+                -- สร้าง ImageLabel สำหรับแสดงรูปภาพไอเทม
+                local count = 0
+                for _, tool in pairs(itemsFound) do
+                    if count < 3 then -- จำกัดแสดงผลสูงสุด 3 ชิ้นเพื่อไม่ให้บังจอ
+                        local assetId = "rbxassetid://0" -- ค่าไอดีเริ่มต้น
+                        if tool:FindFirstChild("TextureId") and tool.TextureId ~= "" then
+                            assetId = tool.TextureId
+                        elseif tool:FindFirstChild("Image") and tool.Image ~= "" then
+                            assetId = tool.Image
+                        end
+
+                        local imgLabel = Instance.new("ImageLabel")
+                        imgLabel.Parent = itemBillboard
+                        imgLabel.BackgroundTransparency = 1
+                        imgLabel.Size = UDim2.new(0, 32, 0, 32)
+                        imgLabel.Image = assetId
+
+                        local corner = Instance.new("UICorner")
+                        corner.CornerRadius = UDim.new(0, 6)
+                        corner.Parent = imgLabel
+
+                        local stroke = Instance.new("UIStroke")
+                        stroke.Color = Color3.fromRGB(180, 130, 255)
+                        stroke.Thickness = 1.2
+                        stroke.Parent = imgLabel
+
+                        count = count + 1
+                    end
+                end
+
+                itemBillboard.Enabled = true
+            else
+                if itemBillboard then itemBillboard.Enabled = false end
+            end
+        end
+    end
+end)
+
+createToggle("มองสิ่งของ/อุปกรณ์เป็นรูปภาพ (Item Icons)", function(enabled)
+    itemEspEnabled = enabled
+end)
+
+-- 3. ปรับขนาด FOV Aimbot (1 - 1000)
+local aimbotFovRadius = 150
+createSlider("Aimbot FOV Size", 1, 1000, 150, function(value)
+    aimbotFovRadius = value
+    FOVCircle.Radius = value
+end)
+
+local fovCircleEnabled = false
+createToggle("แสดงวง FOV บนจอ", function(enabled)
+    fovCircleEnabled = enabled
+    FOVCircle.Visible = enabled
+end)
+
+-- อัปเดตตำแหน่งวงกลม FOV ตามกลางจอ
+RunService.RenderStepped:Connect(function()
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+end)
+
+-- ฟังก์ชันหาเป้าหมายที่อยู่ภายในรัศมี FOV จริงๆ เท่านั้น
+local function getClosestTargetInFOV(partName)
+    local target = nil
+    local shortestDist = aimbotFovRadius
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild(partName) and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health > 0 then
+            local part = plr.Character[partName]
+            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+            if onScreen then
+                local screenPos2D = Vector2.new(screenPos.X, screenPos.Y)
+                local dist = (screenPos2D - screenCenter).Magnitude
+                if dist <= aimbotFovRadius and dist < shortestDist then
+                    shortestDist = dist
+                    target = part
+                end
+            end
+        end
+    end
+    return target
+end
+
+-- 4. Aimbot แบบไม่ล็อคกล้อง (แสดงเส้นชี้เป้าเฉพาะคนที่อยู่ในวง FOV)
+local aimLineEnabled = false
+RunService.RenderStepped:Connect(function()
+    if aimLineEnabled then
+        local targetPart = getClosestTargetInFOV("Head")
+        if targetPart then
+            local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+            if onScreen then
+                AimLine.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                AimLine.To = Vector2.new(screenPos.X, screenPos.Y)
+                AimLine.Visible = true
+            else
+                AimLine.Visible = false
+            end
+        else
+            AimLine.Visible = false
+        end
+    else
+        AimLine.Visible = false
+    end
+end)
+
+createToggle("แสดงเส้นเล็งเป้าในวง FOV (Aim Line)", function(enabled)
+    aimLineEnabled = enabled
+end)
+
+-- 5. ล็อคหัว (Head Lock เฉพาะในวง FOV)
+local headLockEnabled = false
+RunService.RenderStepped:Connect(function()
+    if headLockEnabled then
+        local targetHead = getClosestTargetInFOV("Head")
+        if targetHead then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
+        end
+    end
+end)
+
+createToggle("ล็อคหัวในวง FOV (Head Lock)", function(enabled)
+    headLockEnabled = enabled
+end)
+
+-- 6. ระบบปรับความเร็ว (Speed Hack)
+local speedEnabled = false
+local customWalkSpeed = 35
+
+createToggle("เปิดใช้งานปรับความเร็ว (Speed Hack)", function(enabled)
+    speedEnabled = enabled
+end)
+
+createSlider("ระดับความเร็ว (Speed)", 16, 200, 35, function(value)
+    customWalkSpeed = value
+end)
+
+RunService.Heartbeat:Connect(function()
+    if speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = customWalkSpeed
+    elseif not speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+-- 7. อินฟินิตี้สเตมิน่า (Infinite Stamina)
+local staminaEnabled = false
+RunService.Heartbeat:Connect(function()
+    if staminaEnabled then
+        pcall(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer:SetAttribute("Stamina", 100)
+                LocalPlayer:SetAttribute("MaxStamina", 100)
+            end
+        end)
+    end
+end)
+
+createToggle("สเตมิน่าไม่จำกัด (Infinite Stamina)", function(enabled)
+    staminaEnabled = enabled
+end)
