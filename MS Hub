@@ -1,0 +1,18 @@
+-- MS Hub Loader (Interactive Whitelist Edition)
+local LoadURL = "https://raw.githubusercontent.com/pck9100-lang/myscript/main/Lua"
+
+local Success, Response = pcall(function()
+    return game:HttpGet(LoadURL)
+end)
+
+if Success and Response then
+    local ScriptFunction, ErrorMessage = loadstring(Response)
+    if ScriptFunction then
+        pcall(ScriptFunction)
+        print("MS Hub Loaded Successfully!")
+    else
+        warn("Loadstring Error: " .. tostring(ErrorMessage))
+    end
+else
+    warn("Failed to fetch script from URL: " .. tostring(Response))
+end
