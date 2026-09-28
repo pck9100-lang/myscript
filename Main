@@ -1,0 +1,533 @@
+-- ================= Configuration & Setup =================
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- Check and destroy old GUI (if exists)
+if CoreGui:FindFirstChild("BukPornGui") then
+    CoreGui.BukPornGui:Destroy()
+end
+
+-- Create Main ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BukPornGui"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- ================= Floating Toggle Button =================
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Position = UDim2.new(0.1, 0, 0.1, 0)
+ToggleButton.Size = UDim2.new(0, 55, 0, 55)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = "ปอน"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 12
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(1, 0)
+ButtonCorner.Parent = ToggleButton
+
+local ButtonStroke = Instance.new("UIStroke")
+ButtonStroke.Parent = ToggleButton
+ButtonStroke.Thickness = 3
+
+-- ================= Main Menu Frame =================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.Size = UDim2.new(0, 300, 0, 360)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = false
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.Parent = MainFrame
+
+local RainbowStroke = Instance.new("UIStroke")
+RainbowStroke.Parent = MainFrame
+RainbowStroke.Thickness = 3
+
+-- Rainbow color animation loop
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.005 do
+            local rainbowColor = Color3.fromHSV(i, 1, 1)
+            RainbowStroke.Color = rainbowColor
+            ButtonStroke.Color = rainbowColor
+            task.wait(0.02)
+        end
+    end
+end)
+
+-- Title Bar
+local TitleBar = Instance.new("TextLabel")
+TitleBar.Name = "TitleBar"
+TitleBar.Parent = MainFrame
+TitleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+TitleBar.BorderSizePixel = 0
+TitleBar.Size = UDim2.new(0, 300, 0, 35)
+TitleBar.Font = Enum.Font.GothamBold
+TitleBar.Text = " ⚡ ของบักปอน กุไม่แจก ⚡"
+TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleBar.TextSize = 13
+TitleBar.TextXAlignment = Enum.TextXAlignment.Left
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 8)
+TitleCorner.Parent = TitleBar
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- ================= Scrolling Frame =================
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Name = "ScrollFrame"
+ScrollFrame.Parent = MainFrame
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.Position = UDim2.new(0, 0, 0, 40)
+ScrollFrame.Size = UDim2.new(1, 0, 1, -45)
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 500)
+ScrollFrame.ScrollBarThickness = 6
+ScrollFrame.BorderSizePixel = 0
+
+-- ================= Function 1: WalkSpeed =================
+local speedEnabled = false
+local currentSpeed = 50
+
+local SpeedToggleBtn = Instance.new("TextButton")
+SpeedToggleBtn.Name = "SpeedToggleBtn"
+SpeedToggleBtn.Parent = ScrollFrame
+SpeedToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedToggleBtn.Position = UDim2.new(0, 15, 0, 10)
+SpeedToggleBtn.Size = UDim2.new(0, 150, 0, 30)
+SpeedToggleBtn.Font = Enum.Font.GothamBold
+SpeedToggleBtn.Text = "ความเร็ว: ปิด"
+SpeedToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+SpeedToggleBtn.TextSize = 12
+
+SpeedToggleBtn.MouseButton1Click:Connect(function()
+    speedEnabled = not speedEnabled
+    if speedEnabled then
+        SpeedToggleBtn.Text = "ความเร็ว: เปิด"
+        SpeedToggleBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        SpeedToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        SpeedToggleBtn.Text = "ความเร็ว: ปิด"
+        SpeedToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        SpeedToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Name = "SpeedBox"
+SpeedBox.Parent = ScrollFrame
+SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedBox.Position = UDim2.new(0, 175, 0, 10)
+SpeedBox.Size = UDim2.new(0, 105, 0, 30)
+SpeedBox.Font = Enum.Font.Gotham
+SpeedBox.PlaceholderText = "ความเร็ว"
+SpeedBox.Text = "50"
+SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.TextSize = 12
+
+SpeedBox.FocusLost:Connect(function()
+    local num = tonumber(SpeedBox.Text)
+    if num then currentSpeed = num else SpeedBox.Text = tostring(currentSpeed) end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if speedEnabled then
+            pcall(function()
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                    LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+                end
+            end)
+        end
+    end
+end)
+
+-- ================= Function 2: Infinite Jump =================
+local infJumpEnabled = false
+
+local InfJumpBtn = Instance.new("TextButton")
+InfJumpBtn.Name = "InfJumpBtn"
+InfJumpBtn.Parent = ScrollFrame
+InfJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+InfJumpBtn.Position = UDim2.new(0, 15, 0, 50)
+InfJumpBtn.Size = UDim2.new(0, 265, 0, 30)
+InfJumpBtn.Font = Enum.Font.GothamBold
+InfJumpBtn.Text = "กระโดดไม่จำกัด: ปิด"
+InfJumpBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+InfJumpBtn.TextSize = 12
+
+InfJumpBtn.MouseButton1Click:Connect(function()
+    infJumpEnabled = not infJumpEnabled
+    if infJumpEnabled then
+        InfJumpBtn.Text = "กระโดดไม่จำกัด: เปิด"
+        InfJumpBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        InfJumpBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        InfJumpBtn.Text = "กระโดดไม่จำกัด: ปิด"
+        InfJumpBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        InfJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled then
+        pcall(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    end
+end)
+
+-- ================= Function 3: JumpPower / JumpHeight =================
+local jumpPowerEnabled = false
+local currentJumpPower = 100
+
+local JumpPowerToggleBtn = Instance.new("TextButton")
+JumpPowerToggleBtn.Name = "JumpPowerToggleBtn"
+JumpPowerToggleBtn.Parent = ScrollFrame
+JumpPowerToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+JumpPowerToggleBtn.Position = UDim2.new(0, 15, 0, 90)
+JumpPowerToggleBtn.Size = UDim2.new(0, 150, 0, 30)
+JumpPowerToggleBtn.Font = Enum.Font.GothamBold
+JumpPowerToggleBtn.Text = "กระโดดสูง: ปิด"
+JumpPowerToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+JumpPowerToggleBtn.TextSize = 12
+
+JumpPowerToggleBtn.MouseButton1Click:Connect(function()
+    jumpPowerEnabled = not jumpPowerEnabled
+    if jumpPowerEnabled then
+        JumpPowerToggleBtn.Text = "กระโดดสูง: เปิด"
+        JumpPowerToggleBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        JumpPowerToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        JumpPowerToggleBtn.Text = "กระโดดสูง: ปิด"
+        JumpPowerToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        JumpPowerToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.JumpPower = 50
+        end
+    end
+end)
+
+local JumpPowerBox = Instance.new("TextBox")
+JumpPowerBox.Name = "JumpPowerBox"
+JumpPowerBox.Parent = ScrollFrame
+JumpPowerBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+JumpPowerBox.Position = UDim2.new(0, 175, 0, 90)
+JumpPowerBox.Size = UDim2.new(0, 105, 0, 30)
+JumpPowerBox.Font = Enum.Font.Gotham
+JumpPowerBox.PlaceholderText = "กระโดดสูง"
+JumpPowerBox.Text = "100"
+JumpPowerBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+JumpPowerBox.TextSize = 12
+
+JumpPowerBox.FocusLost:Connect(function()
+    local num = tonumber(JumpPowerBox.Text)
+    if num then currentJumpPower = num else JumpPowerBox.Text = tostring(currentJumpPower) end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if jumpPowerEnabled then
+            pcall(function()
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                    local humanoid = LocalPlayer.Character.Humanoid
+                    if humanoid.UseJumpPower then
+                        humanoid.JumpPower = currentJumpPower
+                    else
+                        humanoid.JumpHeight = currentJumpPower / 3
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- ================= Function 4: Smooth Slow Fall =================
+local slowFallEnabled = false
+local bodyVelocity = nil
+
+local SlowFallBtn = Instance.new("TextButton")
+SlowFallBtn.Name = "SlowFallBtn"
+SlowFallBtn.Parent = ScrollFrame
+SlowFallBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SlowFallBtn.Position = UDim2.new(0, 15, 0, 130)
+SlowFallBtn.Size = UDim2.new(0, 265, 0, 30)
+SlowFallBtn.Font = Enum.Font.GothamBold
+SlowFallBtn.Text = "ลอยตัวตกช้าๆ: ปิด"
+SlowFallBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+SlowFallBtn.TextSize = 12
+
+SlowFallBtn.MouseButton1Click:Connect(function()
+    slowFallEnabled = not slowFallEnabled
+    if slowFallEnabled then
+        SlowFallBtn.Text = "ลอยตัวตกช้าๆ: เปิด"
+        SlowFallBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        SlowFallBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        SlowFallBtn.Text = "ลอยตัวตกช้าๆ: ปิด"
+        SlowFallBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        SlowFallBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        if bodyVelocity then
+            bodyVelocity:Destroy()
+            bodyVelocity = nil
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.05)
+        pcall(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                local hrp = LocalPlayer.Character.HumanoidRootPart
+                local humanoid = LocalPlayer.Character.Humanoid
+                
+                if slowFallEnabled then
+                    if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                        if not hrp:FindFirstChild("SmoothSlowFall") then
+                            bodyVelocity = Instance.new("BodyVelocity")
+                            bodyVelocity.Name = "SmoothSlowFall"
+                            bodyVelocity.MaxForce = Vector3.new(0, 50000, 0)
+                            bodyVelocity.Velocity = Vector3.new(0, -12, 0)
+                            bodyVelocity.Parent = hrp
+                        end
+                    else
+                        if hrp:FindFirstChild("SmoothSlowFall") then
+                            hrp.SmoothSlowFall:Destroy()
+                        end
+                    end
+                else
+                    if hrp:FindFirstChild("SmoothSlowFall") then
+                        hrp.SmoothSlowFall:Destroy()
+                        bodyVelocity = nil
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- ================= Function 5: Noclip =================
+local noclipEnabled = false
+
+local NoclipBtn = Instance.new("TextButton")
+NoclipBtn.Name = "NoclipBtn"
+NoclipBtn.Parent = ScrollFrame
+NoclipBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+NoclipBtn.Position = UDim2.new(0, 15, 0, 170)
+NoclipBtn.Size = UDim2.new(0, 265, 0, 30)
+NoclipBtn.Font = Enum.Font.GothamBold
+NoclipBtn.Text = "เดินทะลุกำแพง (Noclip): ปิด"
+NoclipBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+NoclipBtn.TextSize = 12
+
+NoclipBtn.MouseButton1Click:Connect(function()
+    noclipEnabled = not noclipEnabled
+    if noclipEnabled then
+        NoclipBtn.Text = "เดินทะลุกำแพง (Noclip): เปิด"
+        NoclipBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        NoclipBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        NoclipBtn.Text = "เดินทะลุกำแพง (Noclip): ปิด"
+        NoclipBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        NoclipBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled then
+        pcall(function()
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- ================= Function 6: Player ESP (Rainbow Names) =================
+local playerEspEnabled = false
+
+local PlayerEspBtn = Instance.new("TextButton")
+PlayerEspBtn.Name = "PlayerEspBtn"
+PlayerEspBtn.Parent = ScrollFrame
+PlayerEspBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+PlayerEspBtn.Position = UDim2.new(0, 15, 0, 210)
+PlayerEspBtn.Size = UDim2.new(0, 265, 0, 30)
+PlayerEspBtn.Font = Enum.Font.GothamBold
+PlayerEspBtn.Text = "มองชื่อผู้เล่น (เรนโบว์): ปิด"
+PlayerEspBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+PlayerEspBtn.TextSize = 12
+
+PlayerEspBtn.MouseButton1Click:Connect(function()
+    playerEspEnabled = not playerEspEnabled
+    if playerEspEnabled then
+        PlayerEspBtn.Text = "มองชื่อผู้เล่น (เรนโบว์): เปิด"
+        PlayerEspBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+        PlayerEspBtn.BackgroundColor3 = Color3.fromRGB(40, 90, 40)
+    else
+        PlayerEspBtn.Text = "มองชื่อผู้เล่น (เรนโบว์): ปิด"
+        PlayerEspBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        PlayerEspBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p.Character and p.Character:FindFirstChild("Head") then
+                if p.Character.Head:FindFirstChild("RainbowPlayerESP") then
+                    p.Character.Head.RainbowPlayerESP:Destroy()
+                end
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.05)
+        if playerEspEnabled then
+            pcall(function()
+                local hue = tick() % 5 / 5
+                local rainbowCol = Color3.fromHSV(hue, 1, 1)
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
+                        local head = p.Character.Head
+                        local billboard = head:FindFirstChild("RainbowPlayerESP")
+                        if not billboard then
+                            billboard = Instance.new("BillboardGui")
+                            billboard.Name = "RainbowPlayerESP"
+                            billboard.Size = UDim2.new(0, 100, 0, 40)
+                            billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+                            billboard.AlwaysOnTop = true
+                            billboard.Parent = head
+
+                            local textLabel = Instance.new("TextLabel")
+                            textLabel.Name = "NameLabel"
+                            textLabel.Size = UDim2.new(1, 0, 1, 0)
+                            textLabel.BackgroundTransparency = 1
+                            textLabel.Font = Enum.Font.GothamBold
+                            textLabel.TextSize = 14
+                            textLabel.TextStrokeTransparency = 0.5
+                            textLabel.Parent = billboard
+                        end
+                        if billboard:FindFirstChild("NameLabel") then
+                            billboard.NameLabel.Text = p.Name
+                            billboard.NameLabel.TextColor3 = rainbowCol
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- ================= Function 7: Item ESP (Rarity Tiers) =================
+local espLegendary = false
+local espEpic = false
+local espRare = false
+
+local LegBtn = Instance.new("TextButton")
+LegBtn.Name = "LegBtn"
+LegBtn.Parent = ScrollFrame
+LegBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+LegBtn.Position = UDim2.new(0, 15, 0, 250)
+LegBtn.Size = UDim2.new(0, 265, 0, 30)
+LegBtn.Font = Enum.Font.GothamBold
+LegBtn.Text = "มองไอเทม [หายากที่สุด]: ปิด"
+LegBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+LegBtn.TextSize = 12
+
+LegBtn.MouseButton1Click:Connect(function()
+    espLegendary = not espLegendary
+    if espLegendary then
+        LegBtn.Text = "มองไอเทม [หายากที่สุด]: เปิด"
+        LegBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+        LegBtn.BackgroundColor3 = Color3.fromRGB(90, 75, 0)
+    else
+        LegBtn.Text = "มองไอเทม [หายากที่สุด]: ปิด"
+        LegBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        LegBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
+local EpicBtn = Instance.new("TextButton")
+EpicBtn.Name = "EpicBtn"
+EpicBtn.Parent = ScrollFrame
+EpicBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+EpicBtn.Position = UDim2.new(0, 15, 0, 290)
+EpicBtn.Size = UDim2.new(0, 265, 0, 30)
+EpicBtn.Font = Enum.Font.GothamBold
+EpicBtn.Text = "มองไอเทม [รองหายาก]: ปิด"
+EpicBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+EpicBtn.TextSize = 12
+
+EpicBtn.MouseButton1Click:Connect(function()
+    espEpic = not espEpic
+    if espEpic then
+        EpicBtn.Text = "มองไอเทม [รองหายาก]: เปิด"
+        EpicBtn.TextColor3 = Color3.fromRGB(170, 0, 255)
+        EpicBtn.BackgroundColor3 = Color3.fromRGB(70, 0, 90)
+    else
+        EpicBtn.Text = "มองไอเทม [รองหายาก]: ปิด"
+        EpicBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        EpicBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
+local RareBtn = Instance.new("TextButton")
+RareBtn.Name = "RareBtn"
+RareBtn.Parent = ScrollFrame
+RareBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+RareBtn.Position = UDim2.new(0, 15, 0, 330)
+RareBtn.Size = UDim2.new(0, 265, 0, 30)
+RareBtn.Font = Enum.Font.GothamBold
+RareBtn.Text = "มองไอเทม [รองของรองหายาก]: ปิด"
+RareBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+RareBtn.TextSize = 12
+
+RareBtn.MouseButton1Click:Connect(function()
+    espRare = not espRare
+    if espRare then
+        RareBtn.Text = "มองไอเทม [รองของรองหายาก]: เปิด"
+        RareBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
+        RareBtn.BackgroundColor3 = Color3.fromRGB(0, 60, 90)
+    else
+        RareBtn.Text = "มองไอเทม [รองของรองหายาก]: ปิด"
+        RareBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        RareBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
+local function getItemRarityInfo(itemName)
+    itemName = string.lower(itemName)
+    if string.find(itemName, "legendary") or string.find(itemName, "mythic") or string.find(itemName, "godly") or string.find(itemName, "dragon") or string.find(itemName, "secret") then
+        return "Legendary", Color3.fromRGB(255, 215, 0), 1
+    elseif string.find(itemName, "epic") or string.find(itemName, "rare") or string.find(itemName, "diamond") or string.find(itemName, "purple") then
+        return "Epic", Color3.fromRGB(170, 0, 255), 2
+    elseif string.find(itemName, "uncommon") or string.find(itemName, "common") or string.find(itemName, "blue") or string.find(itemName, "iron") then
+ 
